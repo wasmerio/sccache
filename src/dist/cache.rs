@@ -2,7 +2,7 @@ use crate::dist::Toolchain;
 use crate::lru_disk_cache::Result as LruResult;
 use crate::lru_disk_cache::{LruDiskCache, ReadSeek};
 use anyhow::{anyhow, Result};
-use std::fs;
+use fs_err as fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
@@ -19,10 +19,10 @@ mod client {
     use crate::lru_disk_cache::Error as LruError;
     use anyhow::{bail, Context, Error, Result};
     use std::collections::{HashMap, HashSet};
-    use std::fs;
     use std::io::Write;
     use std::path::{Path, PathBuf};
     use std::sync::Mutex;
+    use fs_err as fs;
 
     use super::{path_key, TcCache};
 
@@ -200,11 +200,14 @@ mod client {
                 return Ok((Toolchain { archive_id }, None));
             }
             debug!("Weak key {} appears to be new", weak_key);
-            let tmpfile = tempfile::NamedTempFile::new_in(self.cache_dir.join("toolchain_tmp"))?;
+            let tmpfile_path = self.cache_dir.join("toolchain_tmp");
+            let tmpfile = tempfile::NamedTempFile::new_in(&tmpfile_path)?;
+            let tmpfile = fs::File::from_parts(tmpfile.reopen()?, &tmpfile_path);
             toolchain_packager
-                .write_pkg(tmpfile.reopen()?)
+                .write_pkg(tmpfile)
                 .context("Could not package toolchain")?;
-            let tc = cache.insert_file(tmpfile.path())?;
+
+            let tc = cache.insert_file(&tmpfile_path)?;
             self.record_weak(weak_key.to_owned(), tc.archive_id.clone())?;
             Ok((tc, None))
         }
@@ -280,6 +283,7 @@ mod client {
     mod test {
         use crate::config;
         use crate::test::utils::create_file;
+        use fs_err as fs;
         use std::io::Write;
 
         use super::ClientToolchains;
@@ -292,7 +296,7 @@ mod client {
         }
         #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
         impl crate::dist::pkg::ToolchainPackager for PanicToolchainPackager {
-            fn write_pkg(self: Box<Self>, _f: ::std::fs::File) -> crate::errors::Result<()> {
+            fn write_pkg(self: Box<Self>, _f: fs::File) -> crate::errors::Result<()> {
                 panic!("should not have called packager")
             }
         }

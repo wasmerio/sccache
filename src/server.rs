@@ -36,12 +36,12 @@ use filetime::FileTime;
 use futures::Future as _;
 use futures_03::executor::ThreadPool;
 use futures_03::{channel::mpsc, compat::*, future, prelude::*, stream};
+use fs_err as fs;
 use number_prefix::NumberPrefix;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::env;
 use std::ffi::{OsStr, OsString};
-use std::fs::metadata;
 use std::io::{self, Write};
 use std::marker::Unpin;
 #[cfg(feature = "dist-client")]
@@ -122,7 +122,7 @@ fn notify_server_startup(name: &Option<OsString>, status: ServerStartup) -> Resu
 
 #[cfg(windows)]
 fn notify_server_startup(name: &Option<OsString>, status: ServerStartup) -> Result<()> {
-    use std::fs::OpenOptions;
+    use fs_err::OpenOptions;
 
     let name = match *name {
         Some(ref s) => s,
@@ -919,7 +919,7 @@ where
             Some(x) => x, // TODO resolve the path right away
             None => {
                 // fallback to using the path directly
-                metadata(&path2)
+                fs::metadata(&path2)
                     .map(|attr| FileTime::from_last_modification_time(&attr))
                     .ok()
                     .map(move |filetime| (path2, filetime))
@@ -930,7 +930,7 @@ where
         let dist_info = match me1.dist_client.get_client() {
             Ok(Some(ref client)) => {
                 if let Some(archive) = client.get_custom_toolchain(&resolved_compiler_path) {
-                    match metadata(&archive)
+                    match fs::metadata(&archive)
                         .map(|attr| FileTime::from_last_modification_time(&attr))
                     {
                         Ok(mtime) => Some((archive, mtime)),

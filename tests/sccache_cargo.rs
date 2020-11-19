@@ -40,10 +40,10 @@ fn test_rust_cargo() {
 #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
 fn test_rust_cargo_cmd(cmd: &str) {
     use assert_cmd::prelude::*;
+    use fs_err as fs;
     use predicates::prelude::*;
     use std::env;
     use std::ffi::OsStr;
-    use std::fs;
     use std::path::Path;
     use std::process::{Command, Stdio};
 
