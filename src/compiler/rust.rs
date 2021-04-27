@@ -228,15 +228,31 @@ where
     let dep_info = run_input_output(cmd, None);
     // Parse the dep-info file, then hash the contents of those files.
     let pool = pool.clone();
-    let cwd = cwd.to_owned();
+    let cwd1 = cwd.to_owned();
+    let cwd2 = cwd.to_owned();
     let crate_name = crate_name.to_owned();
     Box::new(dep_info.and_then(move |_| -> SFuture<_> {
         let name2 = crate_name.clone();
         let parsed = pool.spawn_fn(move || {
-            parse_dep_file(&dep_file, &cwd)
+            parse_dep_file(&dep_file, &cwd1)
                 .with_context(|| format!("Failed to parse dep info for {}", name2))
         });
-        Box::new(parsed.map(move |files| {
+        Box::new(parsed.map(move |mut files| {
+            // HACK: Ideally, if we're compiling a Cargo package, we should be
+            // compiling it with the same files included in the published .crate
+            // package to ensure maximum compatibility. While it's possible for
+            // the crate developers to mark files as required for the compilation
+            // via mechanisms such as `include_bytes!`, this is also a hack and
+            // may leave an undesired footprint in the compilation outputs.
+            // An upstream mechanism to only track required additional files is
+            // pending at https://github.com/rust-lang/rust/pull/84029.
+            // Until then, unconditionally include Cargo.toml manifest to provide
+            // a minimal support and to keep some crates compiling that may
+            // read additional info directly from the manifest file.
+            let manifest_file = cwd2.join("Cargo.toml");
+            if files.iter().find(|&file| file == &manifest_file).is_none() {
+                files.push(manifest_file);
+            }
             trace!(
                 "[{}]: got {} source files from dep-info in {}",
                 crate_name,
