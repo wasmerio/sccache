@@ -51,7 +51,7 @@ fn serve_sfuture(serve: fn(Request<Body>) -> SFutureSend<Response<Body>>) -> imp
             // `{:?}` prints the full cause chain and backtrace.
             let body = format!("{:?}", e);
             eprintln!(
-                "sccache: Error during a request to {} on the client auth web server\n{}",
+                "cachepot: Error during a request to {} on the client auth web server\n{}",
                 uri, body
             );
             let len = body.len();
@@ -306,7 +306,7 @@ mod code_grant_pkce {
                 MIN_TOKEN_VALIDITY_WARNING
             );
             eprintln!(
-                "sccache: Token retrieved expires in under {}",
+                "cachepot: Token retrieved expires in under {}",
                 MIN_TOKEN_VALIDITY_WARNING
             );
         }
@@ -442,7 +442,7 @@ mod implicit {
                         MIN_TOKEN_VALIDITY_WARNING
                     );
                     eprintln!(
-                        "sccache: Token retrieved expires in under {}",
+                        "cachepot: Token retrieved expires in under {}",
                         MIN_TOKEN_VALIDITY_WARNING
                     );
                 }
@@ -573,7 +573,7 @@ pub fn get_token_oauth2_code_grant_pkce(
 
     info!("Listening on http://localhost:{} with 1 thread.", port);
     println!(
-        "sccache: Please visit http://localhost:{} in your browser",
+        "cachepot: Please visit http://localhost:{} in your browser",
         port
     );
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
@@ -614,7 +614,7 @@ pub fn get_token_oauth2_implicit(client_id: &str, mut auth_url: Url) -> Result<S
 
     info!("Listening on http://localhost:{} with 1 thread.", port);
     println!(
-        "sccache: Please visit http://localhost:{} in your browser",
+        "cachepot: Please visit http://localhost:{} in your browser",
         port
     );
     let (shutdown_tx, shutdown_rx) = oneshot::channel();

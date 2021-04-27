@@ -172,7 +172,7 @@ where
         // Check if the value part of this argument begins with '@'. If so, we either
         // failed to expand it, or it was a concatenated argument - either way, bail.
         // We refuse to cache concatenated arguments (like "-include@foo") because they're a
-        // mess. See https://github.com/mozilla/sccache/issues/150#issuecomment-318586953
+        // mess. See https://github.com/paritytech/cachepot/issues/150#issuecomment-318586953
         match arg {
             Argument::WithValue(_, ref v, ArgDisposition::Separated)
             | Argument::WithValue(_, ref v, ArgDisposition::CanBeConcatenated(_))
@@ -391,7 +391,7 @@ impl<'a> Iterator for ExpandAtArgs<'a> {
             //
             // [1]: http://www.vxdev.com/docs/vx55man/diab5.0ppc/c-invoke.htm#3000619
             //
-            // The environment variable feature is *not* supported by sccache
+            // The environment variable feature is *not* supported by cachepot
             // since this would raise the need for the clients environment
             // and not just env::var. This is technically possible, but
             // considered as a unneeded edge case for now.
@@ -621,7 +621,7 @@ mod test {
     #[test]
     fn test_at_signs_file_not_readable() {
         let td = tempfile::Builder::new()
-            .prefix("sccache")
+            .prefix("cachepot")
             .tempdir()
             .unwrap();
         let arg = format!("-@{}", td.path().join("foo").display());
@@ -635,7 +635,7 @@ mod test {
     #[test]
     fn test_at_signs_file() {
         let td = tempfile::Builder::new()
-            .prefix("sccache")
+            .prefix("cachepot")
             .tempdir()
             .unwrap();
         File::create(td.path().join("foo"))

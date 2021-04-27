@@ -842,7 +842,7 @@ pub fn write_temp_file(
 ) -> SFuture<(TempDir, PathBuf)> {
     let path = path.to_owned();
     pool.spawn_fn(move || -> Result<_> {
-        let dir = tempfile::Builder::new().prefix("sccache").tempdir()?;
+        let dir = tempfile::Builder::new().prefix("cachepot").tempdir()?;
         let src = dir.path().join(path);
         let mut file = File::create(&src)?;
         file.write_all(&contents)?;

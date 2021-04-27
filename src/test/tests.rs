@@ -281,16 +281,16 @@ fn test_server_compile() {
 
 #[test]
 // test fails intermittently on macos:
-// https://github.com/mozilla/sccache/issues/234
+// https://github.com/paritytech/cachepot/issues/234
 #[cfg(not(target_os = "macos"))]
 fn test_server_port_in_use() {
     // Bind an arbitrary free port.
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-    let sccache = find_sccache_binary();
-    let output = Command::new(&sccache)
+    let cachepot = find_cachepot_binary();
+    let output = Command::new(&cachepot)
         .arg("--start-server")
         .env(
-            "SCCACHE_SERVER_PORT",
+            "CACHEPOT_SERVER_PORT",
             listener.local_addr().unwrap().port().to_string(),
         )
         .output()

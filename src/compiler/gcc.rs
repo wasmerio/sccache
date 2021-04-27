@@ -247,7 +247,7 @@ where
         // Check if the value part of this argument begins with '@'. If so, we either
         // failed to expand it, or it was a concatenated argument - either way, bail.
         // We refuse to cache concatenated arguments (like "-include@foo") because they're a
-        // mess. See https://github.com/mozilla/sccache/issues/150#issuecomment-318586953
+        // mess. See https://github.com/paritytech/cachepot/issues/150#issuecomment-318586953
         match arg {
             Argument::WithValue(_, ref v, ArgDisposition::Separated)
             | Argument::WithValue(_, ref v, ArgDisposition::CanBeConcatenated(_))
@@ -1265,7 +1265,7 @@ mod test {
     #[test]
     fn at_signs() {
         let td = tempfile::Builder::new()
-            .prefix("sccache")
+            .prefix("cachepot")
             .tempdir()
             .unwrap();
         File::create(td.path().join("foo"))

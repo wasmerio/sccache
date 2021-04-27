@@ -340,7 +340,7 @@ pub fn storage_from_config(config: &Config, pool: &ThreadPool) -> Arc<dyn Storag
                             Some(ServiceAccountInfo::URL(url.clone()))
                         } else {
                             warn!(
-                            "No SCCACHE_GCS_KEY_PATH specified-- no authentication will be used."
+                            "No CACHEPOT_GCS_KEY_PATH specified-- no authentication will be used."
                         );
                             None
                         };

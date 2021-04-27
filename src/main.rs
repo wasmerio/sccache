@@ -16,5 +16,5 @@
 #![deny(clippy::perf)]
 
 fn main() {
-    sccache::main();
+    cachepot::main();
 }
